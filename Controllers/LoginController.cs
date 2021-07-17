@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityJwt.Security;
+using IdentityJwt.UseCases.AccessManagement;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -13,16 +15,17 @@ namespace IdentityJwt.Controllers
     public class LoginController : ControllerBase
     {
         [HttpPost]
-        public Token Post(AccessCredentials credenciais, [FromServices] AccessManager accessManager)
+        public Token Post(AccessCredentials credenciais, 
+            [FromServices] IMediator mediator)
         {
-            if (accessManager.ValidateCredentials(credenciais))
-                return accessManager.GenerateToken(credenciais);
-            else
-                return new ()
-                {
-                    Authenticated = false,
-                    Message = "Falha ao autenticar"
-                };
+            if (mediator.Send(credenciais).Result)
+                return mediator.Send(credenciais.GetTokenRequest()).Result;
+
+            return new()
+            {
+                Authenticated = false,
+                Message = "Falha ao autenticar"
+            };
         }
     }
 }

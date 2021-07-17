@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using IdentityJwt.Security;
 using IdentityJwt.Security.Data;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -52,6 +53,8 @@ namespace IdentityJwt
             // Aciona a extensão que irá configurar o uso de
             // autenticação e autorização via tokens
             services.AddJwtSecurity(tokenConfigurations);
+
+            services.AddMediatR(typeof(Startup).Assembly);
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

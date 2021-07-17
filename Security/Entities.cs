@@ -1,5 +1,7 @@
-using System.Text.Json;
+using IdentityJwt.UseCases.AccessManagement;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
+using System.Text.Json;
 
 namespace IdentityJwt.Security
 {
@@ -7,7 +9,7 @@ namespace IdentityJwt.Security
     {
     }
 
-    public class AccessCredentials
+    public class AccessCredentials : IRequest<bool>
     {
         public string UserID { get; set; }
         public string Password { get; set; }
@@ -16,6 +18,11 @@ namespace IdentityJwt.Security
 
         public bool CompareTokens(string userID, string refreshToken) =>
             userID == this.UserID && refreshToken == this.RefreshToken;
+
+        public GenerateTokenRequest GetTokenRequest() => new()
+        {
+            UserID = this.UserID,
+        };
     }
 
     public class TokenConfigurations

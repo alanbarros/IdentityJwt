@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using IdentityJwt.Security.Data;
+using IdentityJwt.UseCases.AccessManagement;
 
 namespace IdentityJwt.Security
 {
@@ -24,7 +25,7 @@ namespace IdentityJwt.Security
 
             // Configurando a dependência para a classe de validação
             // de credenciais e geração de tokens
-            services.AddScoped<AccessManager>();
+            services.AddScoped<ValidateCredentialsHandler>();
 
             var signingConfigurations =
                 new SigningConfigurations(tokenConfigurations);
