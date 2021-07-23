@@ -1,26 +1,27 @@
 using System;
 using Microsoft.AspNetCore.Identity;
+using IdentityJwt.Repository;
 
 namespace IdentityJwt.Security.Data
 {
-    
+
     public class IdentityInitializer
     {
         private readonly TokenConfigurations _tokenConfigurations;
         private readonly APISecurityDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IRepository<Models.User> _userRepository;
         private readonly RoleManager<IdentityRole> _roleManager;
 
         public IdentityInitializer(
             TokenConfigurations tokenConfigurations,
             APISecurityDbContext context,
-            UserManager<ApplicationUser> userManager,
+            IRepository<Models.User> userRepository,
             RoleManager<IdentityRole> roleManager)
         {
             _tokenConfigurations = tokenConfigurations;
             _context = context;
-            _userManager = userManager;
             _roleManager = roleManager;
+            _userRepository = userRepository;
         }
 
         public void Initialize()
@@ -38,39 +39,20 @@ namespace IdentityJwt.Security.Data
                     }
                 }
 
-                CreateUser(
-                    new ApplicationUser()
-                    {
-                        UserName = "admin_apicontagem",
-                        Email = "admin-apicontagem@teste.com.br",
-                        EmailConfirmed = true
-                    }, "AdminAPIContagem01!", _tokenConfigurations.AccessRole);
+                _userRepository.Add(new Models.User(
+                    userName: "admin_apicontagem",
+                    email: "admin-apicontagem@teste.com.br",
+                    emailConfirmed: true,
+                    password: "AdminAPIContagem01!",
+                    roles: _tokenConfigurations.AccessRole
+                ));
 
-                CreateUser(
-                    new ApplicationUser()
-                    {
-                        UserName = "usrinvalido_apicontagem",
-                        Email = "usrinvalido-apicontagem@teste.com.br",
-                        EmailConfirmed = true
-                    }, "UsrInvAPIContagem01!");
-            }
-        }
-
-        private void CreateUser(
-            ApplicationUser user,
-            string password,
-            string initialRole = null)
-        {
-            if (_userManager.FindByNameAsync(user.UserName).Result == null)
-            {
-                var resultado = _userManager
-                    .CreateAsync(user, password).Result;
-
-                if (resultado.Succeeded &&
-                    !String.IsNullOrWhiteSpace(initialRole))
-                {
-                    _userManager.AddToRoleAsync(user, initialRole).Wait();
-                }
+                _userRepository.Add(new Models.User(
+                    userName: "usrinvalido_apicontagem",
+                    email: "usrinvalido-apicontagem@teste.com.br",
+                    emailConfirmed: true,
+                    password: "UsrInvAPIContagem01!"
+                ));
             }
         }
     }

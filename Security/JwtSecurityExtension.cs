@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using IdentityJwt.Security.Data;
 using IdentityJwt.UseCases.AccessManagement;
+using IdentityJwt.Repository;
 
 namespace IdentityJwt.Security
 {
@@ -27,6 +28,8 @@ namespace IdentityJwt.Security
             // de credenciais e geração de tokens
             services.AddScoped<ValidateCredentialsHandler>();
 
+            services.AddScoped<IRepository<Models.User>, UserRepository>();
+
             var signingConfigurations =
                 new SigningConfigurations(tokenConfigurations);
             services.AddSingleton(signingConfigurations);
@@ -34,7 +37,7 @@ namespace IdentityJwt.Security
             // Configura a dependência da classe que cria usuários
             // para testes da API
             services.AddTransient<IdentityInitializer>();
-                        
+
             services.AddAuthentication(authOptions =>
             {
                 authOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
