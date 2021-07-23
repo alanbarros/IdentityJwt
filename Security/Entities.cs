@@ -1,12 +1,14 @@
 using IdentityJwt.UseCases.AccessManagement;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using System;
 using System.Text.Json;
 
 namespace IdentityJwt.Security
 {
     public class ApplicationUser : IdentityUser
     {
+        public Guid UserId { get; set; }
     }
 
     public class AccessCredentials : IRequest<bool>
@@ -44,7 +46,7 @@ namespace IdentityJwt.Security
         public string RefreshToken { get; set; }
         public string Message { get; set; }
     }
- 
+
     public class RefreshTokenData
     {
         public string RefreshToken { get; set; }
@@ -55,7 +57,7 @@ namespace IdentityJwt.Security
     {
         public static T JsonParse<T>(string text) where T : class, new()
         {
-            if(string.IsNullOrWhiteSpace(text))
+            if (string.IsNullOrWhiteSpace(text))
                 return null;
 
             return JsonSerializer.Deserialize<T>(text);

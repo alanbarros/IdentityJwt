@@ -39,20 +39,7 @@ namespace IdentityJwt.UseCases.AccessManagement
                     "refresh_token" => ValidateRefreshToken(request),
                     _ => false
                 };
-            });            
-        }
-
-        public bool ValidateCredentials(AccessCredentials credenciais)
-        {
-            if (credenciais == null && string.IsNullOrWhiteSpace(credenciais.UserID))
-                return false;
-
-            return credenciais.GrantType switch
-            {
-                "password" => ValidatePassword(credenciais),
-                "refresh_token" => ValidateRefreshToken(credenciais),
-                _ => false
-            };
+            });
         }
 
         #region ValidateCredentials

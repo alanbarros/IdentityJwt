@@ -29,6 +29,7 @@ namespace IdentityJwt.Security
             services.AddScoped<ValidateCredentialsHandler>();
 
             services.AddScoped<IRepository<Models.User>, UserRepository>();
+            services.AddScoped<IRepository<Models.Role>, RoleRepository>();
 
             var signingConfigurations =
                 new SigningConfigurations(tokenConfigurations);
