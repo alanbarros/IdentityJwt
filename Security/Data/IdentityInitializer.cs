@@ -1,6 +1,6 @@
 using System;
-using Microsoft.AspNetCore.Identity;
 using IdentityJwt.Repository;
+using IdentityJwt.Models;
 
 namespace IdentityJwt.Security.Data
 {

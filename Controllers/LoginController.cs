@@ -1,4 +1,5 @@
-﻿using IdentityJwt.Security;
+﻿using IdentityJwt.Models;
+using IdentityJwt.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

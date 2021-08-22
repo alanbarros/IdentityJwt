@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using IdentityJwt.Security.Data;
 using IdentityJwt.UseCases.AccessManagement;
 using IdentityJwt.Repository;
+using IdentityJwt.Models;
 
 namespace IdentityJwt.Security
 {

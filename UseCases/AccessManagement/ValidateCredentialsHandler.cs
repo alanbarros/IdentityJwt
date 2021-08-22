@@ -1,3 +1,4 @@
+using IdentityJwt.Models;
 using IdentityJwt.Security;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -80,13 +81,13 @@ namespace IdentityJwt.UseCases.AccessManagement
 
             if (Util.JsonParse<RefreshTokenData>(storedToken) is RefreshTokenData)
             {
-                var credenciaisValidas = credenciais.CompareTokens(userId, refreshToken);
+                var validatedCredentials = credenciais.CompareTokens(userId, refreshToken);
 
                 // Elimina o token de refresh já que um novo será gerado
-                if (credenciaisValidas)
+                if (validatedCredentials)
                     _cache.Remove(refreshToken);
 
-                return credenciaisValidas;
+                return validatedCredentials;
             }
 
             return false;

@@ -1,3 +1,4 @@
+using IdentityJwt.Models;
 using IdentityJwt.Security;
 using IdentityJwt.Security.Data;
 using Microsoft.EntityFrameworkCore;

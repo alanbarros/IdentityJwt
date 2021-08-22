@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using IdentityJwt.Security;
 using System;
 using System.Linq;
+using IdentityJwt.Models;
 
 namespace IdentityJwt.Repository
 {

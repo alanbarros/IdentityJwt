@@ -9,6 +9,7 @@ using IdentityJwt.Security;
 using MediatR;
 using System.Threading.Tasks;
 using System.Threading;
+using IdentityJwt.Models;
 
 namespace IdentityJwt.UseCases.AccessManagement
 {
@@ -27,7 +28,7 @@ namespace IdentityJwt.UseCases.AccessManagement
             _cache = cache;
         }
 
-        public Task<Token> Handle(GenerateTokenRequest request, CancellationToken cancellationToken)        
+        public Task<Token> Handle(GenerateTokenRequest request, CancellationToken cancellationToken)
         {
             var identity = CreateClaims(request.UserID);
 

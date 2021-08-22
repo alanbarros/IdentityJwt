@@ -1,4 +1,5 @@
 using System.Text;
+using IdentityJwt.Models;
 using Microsoft.IdentityModel.Tokens;
 
 namespace IdentityJwt.Security
@@ -13,7 +14,7 @@ namespace IdentityJwt.Security
             Key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(tokenConfigurations.SecretJWTKey));
 
-            SigningCredentials = new (
+            SigningCredentials = new(
                 Key, SecurityAlgorithms.HmacSha256Signature);
         }
     }
