@@ -1,22 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using IdentityJwt.Security;
+using IdentityJwt.Extensions;
 using IdentityJwt.Security.Data;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
 
 namespace IdentityJwt
 {
@@ -32,35 +21,12 @@ namespace IdentityJwt
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Ativando o uso de cache via Redis
-            services.AddDistributedRedisCache(options =>
-            {
-                options.Configuration =
-                    Configuration.GetConnectionString("ConexaoRedis");
-                options.InstanceName = "Identity Tokens JWT";
-            });
-
-            // Configurando o uso da classe de contexto para
-            // acesso às tabelas do ASP.NET Identity Core
-            services.AddDbContext<APISecurityDbContext>(options =>
-                options.UseInMemoryDatabase("InMemoryDatabase"));
-
-            var tokenConfigurations = new TokenConfigurations();
-            new ConfigureFromConfigurationOptions<TokenConfigurations>(
-                Configuration.GetSection("TokenConfigurations"))
-                    .Configure(tokenConfigurations);
-
-            // Aciona a extensão que irá configurar o uso de
-            // autenticação e autorização via tokens
-            services.AddJwtSecurity(tokenConfigurations);
-
-            services.AddMediatR(typeof(Startup).Assembly);
-
-            services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "IdentityJwt", Version = "v1" });
-            });
+            services
+                .AddRedisCache(Configuration)
+                .AddDataBase()
+                .AddJwtTokens(Configuration)
+                .AddServices()
+                .AddSwashBuckle();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,13 +36,11 @@ namespace IdentityJwt
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "IdentityJwt v1"));
             }
 
-            app.UseCors(builder => builder.AllowAnyMethod()
-                                          .AllowAnyOrigin()
-                                          .AllowAnyHeader());
+            app.UseSwashBuckle();
+
+            app.UseCors(builder => builder.AllowAnyMethod().AllowAnyOrigin().AllowAnyHeader());
 
             app.UseHttpsRedirection();
 
