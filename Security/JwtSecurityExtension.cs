@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using IdentityJwt.Security.Data;
-using IdentityJwt.UseCases.AccessManagement;
 using IdentityJwt.Repository;
+using IdentityJwt.UseCases.AccessManagement.ValidateCredentials;
 
 namespace IdentityJwt.Security
 {

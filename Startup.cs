@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using IdentityJwt.Security;
 using IdentityJwt.Security.Data;
+using IdentityJwt.UseCases.AccessManagement.ValidateCredentials;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -44,6 +45,8 @@ namespace IdentityJwt
             // acesso às tabelas do ASP.NET Identity Core
             services.AddDbContext<APISecurityDbContext>(options =>
                 options.UseInMemoryDatabase("InMemoryDatabase"));
+
+            services.AddScoped<IValidateCredentialsStrategy, ValidateCredentialsStrategy>();
 
             var tokenConfigurations = new TokenConfigurations();
             new ConfigureFromConfigurationOptions<TokenConfigurations>(
