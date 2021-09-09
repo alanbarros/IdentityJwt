@@ -19,12 +19,8 @@ namespace IdentityJwt.Controllers
             this.mediator = mediator;
         }
 
-        /// <summary>
-        /// Obtenha aqui o token ou o refresh token
-        /// </summary>
-        /// <returns></returns>
-        /// <response code="200">Retorna o JWT token e o refresh token</response>
         [HttpPost]
+        [Route("ByPassword")]
         public Token ByPassword(AccessCredentials credenciais)
         {
             if (mediator.Send(credenciais).Result)
@@ -38,9 +34,10 @@ namespace IdentityJwt.Controllers
         }
 
         [HttpPost]
+        [Route("ByRefreshToken")]
         public Token ByRefreshToken(RefreshTokenData refreshToken)
         {
-            if(mediator.Send(refreshToken).Result)
+            if (mediator.Send(refreshToken).Result)
                 return mediator.Send(refreshToken.GetTokenRequest()).Result;
 
             return new()

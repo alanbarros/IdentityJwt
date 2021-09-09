@@ -1,5 +1,4 @@
 using IdentityJwt.Models;
-using IdentityJwt.Security;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Distributed;
@@ -13,7 +12,6 @@ namespace IdentityJwt.UseCases.AccessManagement
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly TokenConfigurations _tokenConfigurations;
-        private readonly IDistributedCache _cache;
 
         public ValidateCredentialsHandler(
             UserManager<ApplicationUser> userManager,
@@ -24,7 +22,6 @@ namespace IdentityJwt.UseCases.AccessManagement
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenConfigurations = tokenConfigurations;
-            _cache = cache;
         }
 
         public Task<bool> Handle(AccessCredentials request, CancellationToken cancellationToken)
@@ -34,16 +31,10 @@ namespace IdentityJwt.UseCases.AccessManagement
                 if (request == null && string.IsNullOrWhiteSpace(request.UserId))
                     return false;
 
-                return request.GrantType switch
-                {
-                    "password" => ValidatePassword(request),
-                    "refresh_token" => ValidateRefreshToken(request),
-                    _ => false
-                };
+                return ValidatePassword(request);
             });
         }
 
-        #region ValidateCredentials
         private bool ValidatePassword(AccessCredentials credenciais)
         {
             var (userId, password) = (credenciais.UserId, credenciais.Password);
@@ -70,28 +61,5 @@ namespace IdentityJwt.UseCases.AccessManagement
             return false;
         }
 
-        private bool ValidateRefreshToken(AccessCredentials credenciais)
-        {
-            var (userId, refreshToken) = (credenciais.UserId, credenciais.RefreshToken);
-
-            if (string.IsNullOrWhiteSpace(credenciais.RefreshToken))
-                return false;
-
-            string storedToken = _cache.GetString(refreshToken);
-
-            if (Util.JsonParse<RefreshTokenData>(storedToken) is RefreshTokenData)
-            {
-                var validatedCredentials = credenciais.CompareTokens(userId, refreshToken);
-
-                // Elimina o token de refresh já que um novo será gerado
-                if (validatedCredentials)
-                    _cache.Remove(refreshToken);
-
-                return validatedCredentials;
-            }
-
-            return false;
-        }
-        #endregion
     }
 }
