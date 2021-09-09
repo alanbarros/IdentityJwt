@@ -9,7 +9,7 @@ namespace IdentityJwt.Models
         /// User name
         /// </summary>
         /// <example>admin_apicontagem</example>
-        public string UserID { get; set; }
+        public string UserId { get; set; }
 
         /// <summary>
         /// Password
@@ -30,11 +30,11 @@ namespace IdentityJwt.Models
         public string GrantType { get; set; }
 
         public bool CompareTokens(string userID, string refreshToken) =>
-            userID == this.UserID && refreshToken == this.RefreshToken;
+            userID == this.UserId && refreshToken == this.RefreshToken;
 
         public GenerateTokenRequest GetTokenRequest() => new()
         {
-            UserID = this.UserID,
+            UserID = this.UserId,
         };
     }
 

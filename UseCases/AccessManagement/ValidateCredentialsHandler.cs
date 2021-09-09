@@ -31,7 +31,7 @@ namespace IdentityJwt.UseCases.AccessManagement
         {
             return Task.Run(() =>
             {
-                if (request == null && string.IsNullOrWhiteSpace(request.UserID))
+                if (request == null && string.IsNullOrWhiteSpace(request.UserId))
                     return false;
 
                 return request.GrantType switch
@@ -46,7 +46,7 @@ namespace IdentityJwt.UseCases.AccessManagement
         #region ValidateCredentials
         private bool ValidatePassword(AccessCredentials credenciais)
         {
-            var (userId, password) = (credenciais.UserID, credenciais.Password);
+            var (userId, password) = (credenciais.UserId, credenciais.Password);
 
             // Verifica a existência do usuário nas tabelas do
             // ASP.NET Core Identity
@@ -72,7 +72,7 @@ namespace IdentityJwt.UseCases.AccessManagement
 
         private bool ValidateRefreshToken(AccessCredentials credenciais)
         {
-            var (userId, refreshToken) = (credenciais.UserID, credenciais.RefreshToken);
+            var (userId, refreshToken) = (credenciais.UserId, credenciais.RefreshToken);
 
             if (string.IsNullOrWhiteSpace(credenciais.RefreshToken))
                 return false;

@@ -91,7 +91,7 @@ namespace IdentityJwt.UseCases.AccessManagement
             var refreshTokenData = new RefreshTokenData
             {
                 RefreshToken = refreshToken,
-                UserID = userId
+                UserId = userId
             };
 
             // Calcula o tempo máximo de validade do refresh token

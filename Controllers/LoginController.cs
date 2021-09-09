@@ -25,10 +25,23 @@ namespace IdentityJwt.Controllers
         /// <returns></returns>
         /// <response code="200">Retorna o JWT token e o refresh token</response>
         [HttpPost]
-        public Token Post(AccessCredentials credenciais)
+        public Token ByPassword(AccessCredentials credenciais)
         {
             if (mediator.Send(credenciais).Result)
                 return mediator.Send(credenciais.GetTokenRequest()).Result;
+
+            return new()
+            {
+                Authenticated = false,
+                Message = "Falha ao autenticar"
+            };
+        }
+
+        [HttpPost]
+        public Token ByRefreshToken(RefreshTokenData refreshToken)
+        {
+            if(mediator.Send(refreshToken).Result)
+                return mediator.Send(refreshToken.GetTokenRequest()).Result;
 
             return new()
             {

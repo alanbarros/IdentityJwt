@@ -1,7 +1,3 @@
-using IdentityJwt.UseCases.AccessManagement;
-using MediatR;
-using Microsoft.AspNetCore.Identity;
-using System;
 using System.Text.Json;
 
 namespace IdentityJwt.Security
@@ -15,5 +11,8 @@ namespace IdentityJwt.Security
 
             return JsonSerializer.Deserialize<T>(text);
         }
+
+        public static T ConvertTo<T>(this string text) where T : class, new()
+            => JsonParse<T>(text);
     }
 }

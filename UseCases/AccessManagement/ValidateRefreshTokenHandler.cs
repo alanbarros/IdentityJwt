@@ -1,19 +1,44 @@
-using System;
+using System.Threading;
+using System.Threading.Tasks;
+using IdentityJwt.Models;
+using IdentityJwt.Security;
+using MediatR;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace IdentityJwt.UseCases.AccessManagement
 {
-    public interface IValidateRefreshToken
+    public class ValidateRefreshTokenHandler : IRequestHandler<RefreshTokenData, bool>
     {
-        bool Validate(Guid refreshToken);
-    }
+        private readonly IDistributedCache _cache;
 
-
-
-    public class ValidateRefreshTokenHandler : IValidateRefreshToken
-    {
-        public bool Validate(Guid refreshToken)
+        public ValidateRefreshTokenHandler(IDistributedCache cache)
         {
-            throw new NotImplementedException();
+            _cache = cache;
+        }
+
+        public Task<bool> Handle(RefreshTokenData request, CancellationToken cancellationToken)
+        {
+            return Task.Run(() =>
+            {
+                if (string.IsNullOrWhiteSpace(request.RefreshToken))
+                    return false;
+
+                RefreshTokenData storedToken = _cache
+                    .GetString(request.RefreshToken)
+                    .ConvertTo<RefreshTokenData>();
+
+                if (storedToken is null)
+                    return false;
+
+                // Elimina o token de refresh já que um novo será gerado
+                if (storedToken.Equals(request))
+                {
+                    _cache.Remove(request.RefreshToken);
+                    return true;
+                }
+
+                return false;
+            });
         }
     }
 }
