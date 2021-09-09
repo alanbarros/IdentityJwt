@@ -1,6 +1,8 @@
 using System;
 using IdentityJwt.Repository;
 using IdentityJwt.Models;
+using MediatR;
+using IdentityJwt.UseCases.CreateUser;
 
 namespace IdentityJwt.Security.Data
 {
@@ -9,19 +11,19 @@ namespace IdentityJwt.Security.Data
     {
         private readonly TokenConfigurations _tokenConfigurations;
         private readonly APISecurityDbContext _context;
-        private readonly IRepository<Models.User> _userRepository;
+        private readonly IMediator _mediator;
         private readonly IRepository<Models.Role> _roleRepository;
 
         public IdentityInitializer(
             TokenConfigurations tokenConfigurations,
             APISecurityDbContext context,
-            IRepository<Models.User> userRepository,
+            IMediator mediator,
             IRepository<Models.Role> roleRepository)
         {
             _tokenConfigurations = tokenConfigurations;
             _context = context;
+            _mediator = mediator;
             _roleRepository = roleRepository;
-            _userRepository = userRepository;
         }
 
         public void Initialize()
@@ -30,22 +32,25 @@ namespace IdentityJwt.Security.Data
             {
                 _roleRepository.Add(new Models.Role(_tokenConfigurations.AccessRole));
 
-                _userRepository.Add(new Models.User(
-                    userId: new Guid("06b2a676-dc43-4aa3-8db8-cdece8d28187"),
+                var user1 = new UserWithRolesRequest(
                     userName: "admin_apicontagem",
                     email: "admin-apicontagem@teste.com.br",
                     emailConfirmed: true,
                     password: "AdminAPIContagem01!",
-                    roles: _tokenConfigurations.AccessRole
-                ));
+                    new System.Collections.Generic.List<string>{
+                        _tokenConfigurations.AccessRole
+                    }
+                );
 
-                _userRepository.Add(new Models.User(
-                    userId: Guid.NewGuid(),
+                var user2 = new UserRequest(
                     userName: "usrinvalido_apicontagem",
                     email: "usrinvalido-apicontagem@teste.com.br",
                     emailConfirmed: true,
                     password: "UsrInvAPIContagem01!"
-                ));
+                );
+
+                _ = _mediator.Send(user1).Result;
+                _ = _mediator.Send(user2).Result;
             }
         }
     }

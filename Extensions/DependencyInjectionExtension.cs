@@ -1,3 +1,4 @@
+using IdentityJwt.Models;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,6 +11,8 @@ namespace IdentityJwt.Extensions
         {
             services.AddMediatR(typeof(Startup).Assembly);
             services.AddControllers();
+
+            services.AddScoped<INotifications, NotificationContext>();
 
             return services;
         }

@@ -3,6 +3,7 @@ using IdentityJwt.Security;
 using System;
 using System.Linq;
 using IdentityJwt.Models;
+using System.Collections.Generic;
 
 namespace IdentityJwt.Repository
 {
@@ -11,10 +12,14 @@ namespace IdentityJwt.Repository
         private const int success = 1;
         private const int fail = 0;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly INotifications _notifications;
 
-        public UserRepository(UserManager<ApplicationUser> userManager)
+        public UserRepository(
+            UserManager<ApplicationUser> userManager,
+            INotifications notifications)
         {
             _userManager = userManager;
+            _notifications = notifications;
         }
 
         public int Add(Models.User user)
@@ -26,6 +31,8 @@ namespace IdentityJwt.Repository
                 var resultado = _userManager
                     .CreateAsync(applicationUser, user.Password).Result;
 
+                AddNotifications(resultado.Errors);
+
                 if (resultado.Succeeded && user.Roles.Any())
                 {
                     _userManager.AddToRolesAsync(applicationUser, user.Roles).Wait();
@@ -35,6 +42,14 @@ namespace IdentityJwt.Repository
             }
 
             return fail;
+        }
+
+        private void AddNotifications(IEnumerable<IdentityError> errors)
+        {
+            foreach (var error in errors)
+            {
+                _notifications.AddNotification(error.Code, error.Description);
+            }
         }
 
         private ApplicationUser GetApplicationUser(Models.User user) => new ApplicationUser
