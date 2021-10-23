@@ -19,7 +19,6 @@ namespace IdentityJwt.Middleware
 
         public async Task Invoke(HttpContext context)
         {
-
             if (context == null) throw new System.ArgumentNullException(nameof(context));
 
             var correlationId = GetOrAddCorrelationHeader(context);

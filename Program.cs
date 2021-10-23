@@ -24,10 +24,12 @@ namespace IdentityJwt
                 })
                 .ConfigureLogging((builderContext, loggingBuilder) =>
                 {
-                    loggingBuilder.AddConfiguration(builderContext.Configuration.GetSection("Logging"));
+                    //loggingBuilder.AddConfiguration(builderContext.Configuration.GetSection("Logging"));
 
                     loggingBuilder.AddSimpleConsole((options) =>
                     {
+                        options.SingleLine = true;
+                        options.TimestampFormat = "hh:mm:ss ";
                         options.IncludeScopes = Convert
                             .ToBoolean(builderContext.Configuration["Logging:IncludeScopes"]);
                     });

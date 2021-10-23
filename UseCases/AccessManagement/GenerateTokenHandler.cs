@@ -10,6 +10,7 @@ using MediatR;
 using System.Threading.Tasks;
 using System.Threading;
 using IdentityJwt.Models;
+using Microsoft.Extensions.Logging;
 
 namespace IdentityJwt.UseCases.AccessManagement
 {
@@ -18,18 +19,23 @@ namespace IdentityJwt.UseCases.AccessManagement
         private readonly SigningConfigurations _signingConfigurations;
         private readonly TokenConfigurations _tokenConfigurations;
         private readonly IDistributedCache _cache;
+        private readonly ILogger<GenerateTokenHandler> logger;
 
         public GenerateTokenHandler(SigningConfigurations signingConfigurations,
             TokenConfigurations tokenConfigurations,
-            IDistributedCache cache)
+            IDistributedCache cache,
+            ILogger<GenerateTokenHandler> logger)
         {
             _signingConfigurations = signingConfigurations;
             _tokenConfigurations = tokenConfigurations;
             _cache = cache;
+            this.logger = logger;
         }
 
         public Task<Token> Handle(GenerateTokenRequest request, CancellationToken cancellationToken)
         {
+            logger.LogInformation("Generating token");
+
             var identity = CreateClaims(request.UserID);
 
             var (dateFrom, dateTo) = GetTokenValidPeriod();

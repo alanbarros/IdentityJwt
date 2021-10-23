@@ -1,5 +1,4 @@
 ﻿using IdentityJwt.Models;
-using IdentityJwt.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -42,6 +41,8 @@ namespace IdentityJwt.Controllers
         [Route("ByRefreshToken")]
         public Token ByRefreshToken(RefreshTokenData refreshToken)
         {
+            logger.LogInformation("Login by refresh token");
+
             if (mediator.Send(refreshToken).Result)
                 return mediator.Send(refreshToken.GetTokenRequest()).Result;
 
