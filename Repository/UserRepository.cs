@@ -9,6 +9,7 @@ namespace IdentityJwt.Repository
 {
     public class UserRepository : IRepository<Models.User>
     {
+        private const int warning = 2;
         private const int success = 1;
         private const int fail = 0;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -31,17 +32,47 @@ namespace IdentityJwt.Repository
                 var resultado = _userManager
                     .CreateAsync(applicationUser, user.Password).Result;
 
+                if (resultado.Succeeded && user.Roles.Any())
+                {
+                    AddRoles(applicationUser, user.Roles);
+                    return success;
+                }
+
                 AddNotifications(resultado.Errors);
+                return fail;
+            }
+
+            _notifications.AddNotification("User", $"The user {user.UserName} already exists");
+
+            return fail;
+        }
+
+        private void AddRoles(ApplicationUser applicationUser, List<string> roles) =>
+            _userManager.AddToRolesAsync(applicationUser, roles).Wait();
+
+        public int Add(Models.User user, IEnumerable<Models.Role> roles)
+        {
+            var applicationUser = GetApplicationUser(user);
+
+            if (_userManager.FindByNameAsync(user.UserName).Result == null)
+            {
+                var resultado = _userManager
+                    .CreateAsync(applicationUser, user.Password).Result;
 
                 if (resultado.Succeeded && user.Roles.Any())
                 {
-                    _userManager.AddToRolesAsync(applicationUser, user.Roles).Wait();
+                    AddRoles(applicationUser, roles.Select(a => a.Name).ToList());
+                    return success;
                 }
 
-                return resultado.Succeeded ? success : fail;
+                AddNotifications(resultado.Errors);
+                return fail;
             }
 
+            _notifications.AddNotification("User", $"The user {user.UserName} already exists");
+
             return fail;
+
         }
 
         private void AddNotifications(IEnumerable<IdentityError> errors)

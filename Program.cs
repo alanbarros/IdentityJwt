@@ -21,6 +21,16 @@ namespace IdentityJwt
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureLogging((builderContext, loggingBuilder) =>
+                {
+                    loggingBuilder.AddConfiguration(builderContext.Configuration.GetSection("Logging"));
+
+                    loggingBuilder.AddSimpleConsole((options) =>
+                    {
+                        options.IncludeScopes = Convert
+                            .ToBoolean(builderContext.Configuration["Logging:IncludeScopes"]);
+                    });
                 });
     }
 }

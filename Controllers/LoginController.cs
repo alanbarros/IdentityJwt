@@ -2,6 +2,7 @@
 using IdentityJwt.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace IdentityJwt.Controllers
 {
@@ -13,9 +14,11 @@ namespace IdentityJwt.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IMediator mediator;
+        private readonly ILogger<LoginController> logger;
 
-        public LoginController(IMediator mediator)
+        public LoginController(IMediator mediator, ILogger<LoginController> logger)
         {
+            this.logger = logger;
             this.mediator = mediator;
         }
 
@@ -23,6 +26,8 @@ namespace IdentityJwt.Controllers
         [Route("ByPassword")]
         public Token ByPassword(AccessCredentials credenciais)
         {
+            logger.LogInformation("Login by password");
+
             if (mediator.Send(credenciais).Result)
                 return mediator.Send(credenciais.GetTokenRequest()).Result;
 

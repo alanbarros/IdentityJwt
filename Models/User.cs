@@ -13,6 +13,8 @@ namespace IdentityJwt.Models
         public string Password { get; set; }
         public List<string> Roles { get; set; }
 
+        public List<Role> GetRoles() => Roles.Select(s => new Role(s)).ToList();
+
         public User(Guid userId, string userName, string email, bool emailConfirmed, string password, List<string> roles)
         {
             UserId = userId;

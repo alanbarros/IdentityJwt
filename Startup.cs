@@ -1,4 +1,5 @@
 using IdentityJwt.Extensions;
+using IdentityJwt.Middleware;
 using IdentityJwt.Security.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,6 +27,7 @@ namespace IdentityJwt
                 .AddDataBase()
                 .AddJwtTokens(Configuration)
                 .AddServices()
+                .AddLogging()
                 .AddSwashBuckle();
         }
 
@@ -37,6 +39,8 @@ namespace IdentityJwt
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseMiddleware<ScopedLoggingMiddleware>();
 
             app.UseSwashBuckle();
 
