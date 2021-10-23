@@ -22,17 +22,23 @@ namespace IdentityJwt
                 {
                     webBuilder.UseStartup<Startup>();
                 })
-                .ConfigureLogging((builderContext, loggingBuilder) =>
-                {
-                    //loggingBuilder.AddConfiguration(builderContext.Configuration.GetSection("Logging"));
+                // .ConfigureLogging((builderContext, loggingBuilder) =>
+                // {
+                //     //loggingBuilder.AddConfiguration(builderContext.Configuration.GetSection("Logging"));
 
-                    loggingBuilder.AddSimpleConsole((options) =>
-                    {
-                        options.SingleLine = true;
-                        options.TimestampFormat = "hh:mm:ss ";
-                        options.IncludeScopes = Convert
-                            .ToBoolean(builderContext.Configuration["Logging:IncludeScopes"]);
-                    });
+                //     loggingBuilder.AddSimpleConsole((options) =>
+                //     {
+                //         options.SingleLine = true;
+                //         options.TimestampFormat = "hh:mm:ss ";
+                //         options.IncludeScopes = Convert
+                //             .ToBoolean(builderContext.Configuration["Logging:IncludeScopes"]);
+                //     });
+                // })                
+                .ConfigureAppConfiguration((builderContext, config) =>
+                {
+                    config.SetBasePath(builderContext.HostingEnvironment.ContentRootPath)
+                        .AddJsonFile($"appsettings.json", optional: false, reloadOnChange: false)
+                        .AddEnvironmentVariables();
                 });
     }
 }

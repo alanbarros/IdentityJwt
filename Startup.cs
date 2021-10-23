@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace IdentityJwt
 {
@@ -15,6 +16,10 @@ namespace IdentityJwt
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
         }
 
         public IConfiguration Configuration { get; }
@@ -27,7 +32,10 @@ namespace IdentityJwt
                 .AddDataBase()
                 .AddJwtTokens(Configuration)
                 .AddServices()
-                .AddLogging()
+                .AddLogging((builder) =>
+                {
+                    builder.AddSerilog(dispose: true);
+                })
                 .AddSwashBuckle();
         }
 
@@ -40,7 +48,8 @@ namespace IdentityJwt
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMiddleware<ScopedLoggingMiddleware>();
+            //app.UseMiddleware<ScopedLoggingMiddleware>();
+            app.UseMiddleware<ScopedSerilogSpecificLoggingMiddleware>();
 
             app.UseSwashBuckle();
 
