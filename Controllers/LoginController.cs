@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace IdentityJwt.Controllers
 {
@@ -23,34 +24,30 @@ namespace IdentityJwt.Controllers
 
         [HttpPost]
         [Route("ByPassword")]
-        public Token ByPassword(AccessCredentials credenciais)
+        [ProducesResponseType(typeof(Token), 200)]
+        [ProducesResponseType(401)]
+        public async Task<IActionResult> ByPassword(AccessCredentials credenciais)
         {
             logger.LogInformation("Login by password");
 
             if (mediator.Send(credenciais).Result)
-                return mediator.Send(credenciais.GetTokenRequest()).Result;
+                return new OkObjectResult(await mediator.Send(credenciais.GetTokenRequest()));
 
-            return new()
-            {
-                Authenticated = false,
-                Message = "Falha ao autenticar"
-            };
+            return new UnauthorizedResult();
         }
 
         [HttpPost]
         [Route("ByRefreshToken")]
-        public Token ByRefreshToken(RefreshTokenData refreshToken)
+        [ProducesResponseType(typeof(Token), 200)]
+        [ProducesResponseType(401)]
+        public async Task<IActionResult> ByRefreshToken(RefreshTokenData refreshToken)
         {
             logger.LogInformation("Login by refresh token");
 
             if (mediator.Send(refreshToken).Result)
-                return mediator.Send(refreshToken.GetTokenRequest()).Result;
+                return new OkObjectResult(await mediator.Send(refreshToken.GetTokenRequest()));
 
-            return new()
-            {
-                Authenticated = false,
-                Message = "Falha ao autenticar"
-            };
+            return new UnauthorizedResult();
         }
     }
 }

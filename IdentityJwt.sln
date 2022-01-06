@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31423.177
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityJwt", "IdentityJwt.csproj", "{A3828CBD-76B0-4EFF-852C-CC56A3910BE9}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{7D6C6B71-5408-4DDA-B6F8-D23C0D5EB9D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{A3828CBD-76B0-4EFF-852C-CC56A3910BE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3828CBD-76B0-4EFF-852C-CC56A3910BE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3828CBD-76B0-4EFF-852C-CC56A3910BE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D6C6B71-5408-4DDA-B6F8-D23C0D5EB9D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D6C6B71-5408-4DDA-B6F8-D23C0D5EB9D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D6C6B71-5408-4DDA-B6F8-D23C0D5EB9D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D6C6B71-5408-4DDA-B6F8-D23C0D5EB9D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
