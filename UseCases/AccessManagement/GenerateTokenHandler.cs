@@ -11,12 +11,15 @@ using System.Threading.Tasks;
 using System.Threading;
 using IdentityJwt.Models;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Identity;
+using System.Linq;
 
 namespace IdentityJwt.UseCases.AccessManagement
 {
     public class GenerateTokenHandler : IRequestHandler<GenerateTokenRequest, Token>
     {
         private readonly SigningConfigurations _signingConfigurations;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly TokenConfigurations _tokenConfigurations;
         private readonly IDistributedCache _cache;
         private readonly ILogger<GenerateTokenHandler> logger;
@@ -24,19 +27,34 @@ namespace IdentityJwt.UseCases.AccessManagement
         public GenerateTokenHandler(SigningConfigurations signingConfigurations,
             TokenConfigurations tokenConfigurations,
             IDistributedCache cache,
-            ILogger<GenerateTokenHandler> logger)
+            ILogger<GenerateTokenHandler> logger, 
+            UserManager<ApplicationUser> userManager)
         {
             _signingConfigurations = signingConfigurations;
             _tokenConfigurations = tokenConfigurations;
             _cache = cache;
             this.logger = logger;
+            _userManager = userManager;
         }
 
-        public Task<Token> Handle(GenerateTokenRequest request, CancellationToken cancellationToken)
+        public async Task<Token> Handle(GenerateTokenRequest request, CancellationToken cancellationToken)
         {
             logger.LogInformation("Generating token");
 
-            var identity = CreateClaims(request.UserID);
+            var roles = await _userManager.GetRolesAsync(request.ApplicationUser);
+
+            var identity = CreateClaims(request.ApplicationUser, () =>
+            {
+                var claims = roles.Select(role => new Claim(ClaimTypes.Role, role)).ToList();
+
+                claims.AddRange(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, request.ApplicationUser.Id),
+                    new Claim(ClaimTypes.Name, request.ApplicationUser.UserName)
+                });
+
+                return claims.ToArray();
+            });
 
             var (dateFrom, dateTo) = GetTokenValidPeriod();
 
@@ -44,22 +62,14 @@ namespace IdentityJwt.UseCases.AccessManagement
 
             var token = GetToken(strToken, dateFrom, dateTo);
 
-            StoreRefreshToken(request.UserID, token.RefreshToken);
+            StoreRefreshToken(request.ApplicationUser.UserName, token.RefreshToken);
 
-            return Task.FromResult(token);
+            return await Task.FromResult(token);
         }
 
         #region GenerateToken
 
-        private static ClaimsIdentity CreateClaims(string userId) =>
-            new(
-                new GenericIdentity(userId, "Login"),
-                new[]
-                {
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString("N")),
-                    new Claim(JwtRegisteredClaimNames.UniqueName, userId)
-                }
-            );
+        private static ClaimsIdentity CreateClaims(ApplicationUser applicationUser, Func<Claim[]> roles) => new(roles());
 
         private string GetStringToken(ClaimsIdentity identity, DateTime dateFrom, DateTime dateTo)
         {
@@ -118,6 +128,6 @@ namespace IdentityJwt.UseCases.AccessManagement
 
     public class GenerateTokenRequest : IRequest<Token>
     {
-        public string UserID { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
     }
 }

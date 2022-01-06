@@ -1,9 +1,10 @@
 using IdentityJwt.UseCases.AccessManagement;
 using MediatR;
+using Optional;
 
 namespace IdentityJwt.Models
 {
-    public class AccessCredentials : IRequest<bool>
+    public class AccessCredentials : IRequest<Option<ApplicationUser>>
     {
         /// <summary>
         /// User name
@@ -16,9 +17,9 @@ namespace IdentityJwt.Models
         /// </summary>
         /// <example>AdminAPIContagem01!</example>
         public string Password { get; set; }
-        public GenerateTokenRequest GetTokenRequest() => new()
+        public GenerateTokenRequest GetTokenRequest(ApplicationUser applicationUser) => new()
         {
-            UserID = this.UserId,
+            ApplicationUser = applicationUser
         };
     }
 

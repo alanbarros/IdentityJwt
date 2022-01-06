@@ -16,14 +16,14 @@ namespace IdentityJwt.UseCases.CreateUser
             this.userRepository = userRepository;
         }
 
-        public Task<User> Handle(UserRequest request, CancellationToken cancellationToken)
+        public async Task<User> Handle(UserRequest request, CancellationToken cancellationToken)
         {
-            return Task.FromResult<User>(CreateUser(request));
+            return await Task.Run(() => CreateUser(request));
         }
 
-        public Task<User> Handle(UserWithRolesRequest request, CancellationToken cancellationToken)
+        public async Task<User> Handle(UserWithRolesRequest request, CancellationToken cancellationToken)
         {
-            return Task.FromResult<User>(CreateUser(request));
+            return await Task.Run(() => CreateUser(request));
         }
 
         private User CreateUser(UserRequest userRequest)
@@ -52,8 +52,13 @@ namespace IdentityJwt.UseCases.CreateUser
             Password = password;
         }
 
-        public User UserBuilder(List<string> roles) => new User(System.Guid.NewGuid(),
-            this.UserName, this.Email, this.EmailConfirmed, this.Password, roles);
+        public User UserBuilder(List<string> roles) => new(
+            System.Guid.NewGuid(),
+            this.UserName, 
+            this.Email, 
+            this.EmailConfirmed, 
+            this.Password, 
+            roles);
 
         public virtual User UserBuilder() => UserBuilder(new List<string>());
     }

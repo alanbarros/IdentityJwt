@@ -1,9 +1,10 @@
 using MediatR;
 using IdentityJwt.UseCases.AccessManagement;
+using Optional;
 
 namespace IdentityJwt.Models
 {
-    public class RefreshTokenData : IRequest<bool>
+    public class RefreshTokenData : IRequest<Option<ApplicationUser>>
     {
 
         /// <summary>
@@ -22,9 +23,9 @@ namespace IdentityJwt.Models
         public bool Equals(RefreshTokenData obj) =>
             CompareTokens(obj.UserId, obj.RefreshToken);
 
-        public GenerateTokenRequest GetTokenRequest() => new()
+        public GenerateTokenRequest GetTokenRequest(ApplicationUser applicationUser) => new()
         {
-            UserID = this.UserId,
+            ApplicationUser = applicationUser,
         };
     }
 }

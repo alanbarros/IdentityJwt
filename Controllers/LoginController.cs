@@ -1,7 +1,9 @@
 ﻿using IdentityJwt.Models;
+using IdentityJwt.UseCases.AccessManagement;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 
 namespace IdentityJwt.Controllers
@@ -30,10 +32,9 @@ namespace IdentityJwt.Controllers
         {
             logger.LogInformation("Login by password");
 
-            if (mediator.Send(credenciais).Result)
-                return new OkObjectResult(await mediator.Send(credenciais.GetTokenRequest()));
+            var option = await mediator.Send(credenciais);
 
-            return new UnauthorizedResult();
+            return GetResponse(option, credenciais.GetTokenRequest);
         }
 
         [HttpPost]
@@ -44,10 +45,17 @@ namespace IdentityJwt.Controllers
         {
             logger.LogInformation("Login by refresh token");
 
-            if (mediator.Send(refreshToken).Result)
-                return new OkObjectResult(await mediator.Send(refreshToken.GetTokenRequest()));
+            var option = await mediator.Send(refreshToken);
 
-            return new UnauthorizedResult();
+            return GetResponse(option, refreshToken.GetTokenRequest);
         }
+
+        private IActionResult GetResponse(
+            Optional.Option<ApplicationUser> option, 
+            Func<ApplicationUser, GenerateTokenRequest> GetTokenRequest) =>
+            option.Match<IActionResult>(
+                some: x => new OkObjectResult(mediator.Send(GetTokenRequest(x)).Result),
+                none: () => new UnauthorizedResult()
+                );
     }
 }

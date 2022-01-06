@@ -3,6 +3,7 @@ using IdentityJwt.UseCases.CreateUser;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace IdentityJwt.Controllers
 {
@@ -13,15 +14,13 @@ namespace IdentityJwt.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(User), 200)]
         [ProducesResponseType(typeof(List<Notification>), 400)]
-        public IActionResult Add(
+        public async Task<IActionResult> Add(
             [FromBody] UserRequest user,
             [FromServices] IMediator mediator,
             [FromServices] INotifications notification
             )
         {
-            User result = mediator.Send(user).Result;
-
-            if (result is not null)
+            if (await mediator.Send(user) is User result)
                 return new OkObjectResult(result);
 
             return new BadRequestObjectResult(notification.Notifications);

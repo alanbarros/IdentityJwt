@@ -1,45 +1,41 @@
 using IdentityJwt.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Optional;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace IdentityJwt.UseCases.AccessManagement
 {
-    public class ValidateCredentialsHandler : IRequestHandler<AccessCredentials, bool>
+    public class ValidateCredentialsHandler : IRequestHandler<AccessCredentials, Option<ApplicationUser>>
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly TokenConfigurations _tokenConfigurations;
         private readonly ILogger<ValidateCredentialsHandler> _logger;
 
         public ValidateCredentialsHandler(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            TokenConfigurations tokenConfigurations,
-            IDistributedCache cache,
             ILogger<ValidateCredentialsHandler> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            _tokenConfigurations = tokenConfigurations;
             _logger = logger;
         }
 
-        public Task<bool> Handle(AccessCredentials request, CancellationToken cancellationToken)
+        public async Task<Option<ApplicationUser>> Handle(AccessCredentials request, CancellationToken cancellationToken)
         {
-            return Task.Run(() =>
+            return await Task.Run(() =>
             {
                 if (request == null && string.IsNullOrWhiteSpace(request.UserId))
-                    return false;
+                    return Option.None<ApplicationUser>();
 
                 return ValidatePassword(request);
             });
         }
 
-        private bool ValidatePassword(AccessCredentials credenciais)
+        private Option<ApplicationUser> ValidatePassword(AccessCredentials credenciais)
         {
             _logger.LogInformation("Validating credential");
 
@@ -47,10 +43,10 @@ namespace IdentityJwt.UseCases.AccessManagement
 
             // Verifica a existência do usuário nas tabelas do
             // ASP.NET Core Identity
-            var userIdentity = _userManager.FindByNameAsync(userId).Result;
+            ApplicationUser userIdentity = _userManager.FindByNameAsync(userId).Result;
 
             if (userIdentity == null)
-                return false;
+                return Option.None<ApplicationUser>();
 
             // Efetua o login com base no Id do usuário e sua senha
             var resultadoLogin = _signInManager
@@ -59,14 +55,12 @@ namespace IdentityJwt.UseCases.AccessManagement
             if (resultadoLogin.Succeeded)
             {
                 _logger.LogInformation("Credential validated");
-                // Verifica se o usuário em questão possui
-                // a role de acesso
-                return _userManager.IsInRoleAsync(
-                    userIdentity, _tokenConfigurations.AccessRole).Result;
+
+                return userIdentity.Some();
             }
 
             _logger.LogWarning("Invalid credential");
-            return false;
+            return Option.None<ApplicationUser>();
         }
 
     }
