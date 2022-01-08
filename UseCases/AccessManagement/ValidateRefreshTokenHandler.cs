@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
+using IdentityJwt.Infra.Security;
 using IdentityJwt.Models;
-using IdentityJwt.Security;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Distributed;

@@ -2,7 +2,7 @@ using IdentityJwt.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace IdentityJwt.Security.Data
+namespace IdentityJwt.Infra.Data
 {
     public class APISecurityDbContext : IdentityDbContext<ApplicationUser>
     {

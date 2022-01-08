@@ -1,10 +1,11 @@
+using AutoMapper;
+using IdentityJwt.Infra.Data;
 using IdentityJwt.Models;
-using IdentityJwt.Security;
-using IdentityJwt.Security.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+using System.Linq;
+using System.Reflection;
 
 namespace IdentityJwt.Extensions
 {
@@ -36,21 +37,24 @@ namespace IdentityJwt.Extensions
             return services;
         }
 
-        public static IServiceCollection AddJwtTokens(
-            this IServiceCollection services,
-            IConfiguration configuration)
+        public static IServiceCollection AddAutoMapper(this IServiceCollection services)
         {
+            IMapper mapper = new MapperConfiguration(cfg =>
+            {
+                Assembly.GetExecutingAssembly()
+                    .GetTypes()
+                    .Where(type => type.BaseType == typeof(Profile))
+                    .ToList()
+                    .ForEach(profile => cfg.AddProfile(profile));
+            }).CreateMapper();
 
-            var tokenConfigurations = new TokenConfigurations();
-            new ConfigureFromConfigurationOptions<TokenConfigurations>(
-                configuration.GetSection("TokenConfigurations"))
-                    .Configure(tokenConfigurations);
-
-            // Aciona a extensão que irá configurar o uso de
-            // autenticação e autorização via tokens
-            services.AddJwtSecurity(tokenConfigurations);
+            services.AddSingleton(mapper);
 
             return services;
         }
+
+        public static TokenConfigurations TokenConfigurations(IConfiguration configuration) =>
+            configuration.GetSection("TokenConfigurations").Get<TokenConfigurations>();
+
     }
 }

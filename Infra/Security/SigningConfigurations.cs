@@ -2,7 +2,7 @@ using System.Text;
 using IdentityJwt.Models;
 using Microsoft.IdentityModel.Tokens;
 
-namespace IdentityJwt.Security
+namespace IdentityJwt.Infra.Security
 {
     public class SigningConfigurations
     {

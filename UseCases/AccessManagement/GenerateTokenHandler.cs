@@ -5,7 +5,6 @@ using System.Security.Principal;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
-using IdentityJwt.Security;
 using MediatR;
 using System.Threading.Tasks;
 using System.Threading;
@@ -13,6 +12,7 @@ using IdentityJwt.Models;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
+using IdentityJwt.Infra.Security;
 
 namespace IdentityJwt.UseCases.AccessManagement
 {

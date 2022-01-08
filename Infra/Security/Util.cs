@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace IdentityJwt.Security
+namespace IdentityJwt.Infra.Security
 {
     public static class Util
     {

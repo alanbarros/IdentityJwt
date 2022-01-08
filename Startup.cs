@@ -1,6 +1,6 @@
 using IdentityJwt.Extensions;
+using IdentityJwt.Infra.Data;
 using IdentityJwt.Middleware;
-using IdentityJwt.Security.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Rewrite;
@@ -30,7 +30,8 @@ namespace IdentityJwt
             services
                 .AddRedisCache(Configuration)
                 .AddDataBase()
-                .AddJwtTokens(Configuration)
+                .AddAutoMapper()
+                .AddJwtSecurity(CommonExtensions.TokenConfigurations(Configuration))
                 .AddServices()
                 .AddLogging((builder) =>
                 {

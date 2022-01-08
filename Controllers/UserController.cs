@@ -14,17 +14,15 @@ namespace IdentityJwt.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(User), 200)]
         [ProducesResponseType(typeof(List<Notification>), 400)]
+        [Route("Add")]
         public async Task<IActionResult> Add(
             [FromBody] UserRequest user,
             [FromServices] IMediator mediator,
-            [FromServices] INotifications notification
-            )
-        {
-            if (await mediator.Send(user) is User result)
-                return new OkObjectResult(result);
-
-            return new BadRequestObjectResult(notification.Notifications);
-        }
+            [FromServices] INotifications notification) => 
+            (await mediator.Send(user))
+                .Match<IActionResult>(
+                    some: _ => new OkObjectResult(user.User),
+                    none: () => new BadRequestObjectResult(notification.Notifications));
 
     }
 }

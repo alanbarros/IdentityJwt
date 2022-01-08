@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
-using IdentityJwt.Security.Data;
 using IdentityJwt.UseCases.AccessManagement;
-using IdentityJwt.Repository;
 using IdentityJwt.Models;
+using IdentityJwt.Infra.Data;
+using IdentityJwt.Infra.Repository;
+using IdentityJwt.Infra.Security;
 
-namespace IdentityJwt.Security
+namespace IdentityJwt.Extensions
 {
     public static class JwtSecurityExtension
     {
@@ -17,6 +18,8 @@ namespace IdentityJwt.Security
             TokenConfigurations tokenConfigurations)
         {
             services.AddSingleton(tokenConfigurations);
+            var signingConfigurations = new SigningConfigurations(tokenConfigurations);
+            services.AddSingleton(signingConfigurations);
 
             // Ativando a utilização do ASP.NET Identity, a fim de
             // permitir a recuperação de seus objetos via injeção de
@@ -29,12 +32,8 @@ namespace IdentityJwt.Security
             // de credenciais e geração de tokens
             services.AddScoped<ValidateCredentialsHandler>();
 
-            services.AddScoped<IRepository<Models.User>, UserRepository>();
-            services.AddScoped<IRepository<Models.Role>, RoleRepository>();
-
-            var signingConfigurations =
-                new SigningConfigurations(tokenConfigurations);
-            services.AddSingleton(signingConfigurations);
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
 
             // Configura a dependência da classe que cria usuários
             // para testes da API

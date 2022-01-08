@@ -11,6 +11,8 @@ namespace IdentityJwt.Models
         bool HasNotifications { get; }
 
         void AddNotification(string key, string message);
+
+        void AddNotifications(IEnumerable<(string key, string value)> errors);
     }
 
 }

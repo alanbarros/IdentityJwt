@@ -18,6 +18,13 @@ namespace IdentityJwt.Models
 
         public void AddNotification(string key, string message)
             => Notifications.Add(new Notification(key, message));
+        public void AddNotifications(IEnumerable<(string key, string value)> errors)
+        {
+            foreach (var error in errors)
+            {
+                AddNotification(error.key, error.value);
+            }
+        }
     }
 
 }
